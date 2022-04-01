@@ -1,5 +1,9 @@
 # Implementing a Control Plane using P4Runtime
 
+## Different
+
+针对 mycontroller.py 的缺陷，将功能补充完整，所有主机均能互通，且每条链路可以双向计数
+
 ## Introduction
 
 In this exercise, we will be using P4Runtime to send flow entries to the
@@ -28,34 +32,43 @@ to install a few rules, and look at the `ingressTunnelCounter` to see that thing
 are working as expected.
 
 1. In your shell, run:
+
    ```bash
    make
    ```
+
    This will:
-   * compile `advanced_tunnel.p4`,
-   * start a Mininet instance with three switches (`s1`, `s2`, `s3`)
+
+   - compile `advanced_tunnel.p4`,
+   - start a Mininet instance with three switches (`s1`, `s2`, `s3`)
      configured in a triangle, each connected to one host (`h1`, `h2`, `h3`), and
-   * assign IPs of `10.0.1.1`, `10.0.2.2`, `10.0.3.3` to the respective hosts.
+   - assign IPs of `10.0.1.1`, `10.0.2.2`, `10.0.3.3` to the respective hosts.
 
 2. You should now see a Mininet command prompt. Start a ping between h1 and h2:
+
    ```bash
    mininet> h1 ping h2
    ```
+
    Because there are no rules on the switches, you should **not** receive any
    replies yet. You should leave the ping running in this shell.
 
 3. Open another shell and run the starter code:
+
    ```bash
    cd ~/tutorials/exercises/p4runtime
    ./mycontroller.py
    ```
+
    This will install the `advanced_tunnel.p4` program on the switches and push the
    tunnel ingress rules.
    The program prints the tunnel ingress and egress counters every 2 seconds.
    You should see the ingress tunnel counter for s1 increasing:
+
    ```
     s1 ingressTunnelCounter 100: 2 packets
    ```
+
    The other counters should remain at zero.
 
 4. Press `Ctrl-C` to the second shell to stop `mycontroller.py`
@@ -76,6 +89,7 @@ grpc._channel._Rendezvous: <_Rendezvous of RPC that terminated with (StatusCode.
 ```
 
 You can check to see which of gRPC ports are listening on the machine by running:
+
 ```bash
 sudo netstat -lpnt
 ```
@@ -101,6 +115,7 @@ reflected in your table entries.
 ## Step 2: Implement Tunnel Forwarding
 
 The `mycontroller.py` file is a basic controller plane that does the following:
+
 1. Establishes a gRPC connection to the switches for the P4Runtime service.
 2. Pushes the P4 program to each switch.
 3. Writes tunnel ingress and tunnel egress rules for two tunnels between h1 and h2.
@@ -116,6 +131,7 @@ that will match on tunnel ID and forward packets to the next hop.
 
 In this exercise, you will be interacting with some of the classes and methods in
 the `p4runtime_lib` directory. Here is a summary of each of the files in the directory:
+
 - `helper.py`
   - Contains the `P4InfoHelper` class which is used to parse the `p4info` files.
   - Provides translation methods from entity name to and from ID number.
@@ -133,11 +149,11 @@ the `p4runtime_lib` directory. Here is a summary of each of the files in the dir
     numbers to the byte strings required for the protocol buffer messages.
   - Used by `helper.py`
 
-
 ## Step 3: Run your solution
 
 Follow the instructions from Step 1. If your Mininet network is still running,
 you will just need to run the following in your second shell:
+
 ```bash
 ./my_controller.py
 ```
@@ -152,15 +168,17 @@ IDs rather than the table names. You can use the P4Info helper to translate thes
 into entry names.
 
 Also, you may want to think about the following:
+
 - What assumptions about the topology are baked into your implementation? How would you
-need to change it for a more realistic network?
+  need to change it for a more realistic network?
 
 - Why are the byte counters different between the ingress and egress counters?
 
 - What is the TTL in the ICMP replies? Why is it the value that it is?
-Hint: The default TTL is 64 for packets sent by the hosts.
+  Hint: The default TTL is 64 for packets sent by the hosts.
 
 If you are interested, you can find the protocol buffer and gRPC definitions here:
+
 - [P4Runtime](https://github.com/p4lang/PI/blob/master/proto/p4/p4runtime.proto)
 - [P4Info](https://github.com/p4lang/PI/blob/master/proto/p4/config/p4info.proto)
 
@@ -168,6 +186,7 @@ If you are interested, you can find the protocol buffer and gRPC definitions her
 
 If the Mininet shell crashes, it may leave a Mininet instance
 running in the background. Use the following command to clean up:
+
 ```bash
 make clean
 ```
@@ -176,21 +195,21 @@ make clean
 
 To run the reference solution, you should run the following command from the
 `~/tutorials/P4D2_2017_Fall/exercises/p4runtime` directory:
+
 ```bash
 solution/my_controller.py
 ```
-
 
 ## Next Steps
 
 Congratulations, your implementation works! Move onto the next assignment
 [mri](../mri)!
 
-
 ## Relevant Documentation
 
 The documentation for P4_16 and P4Runtime is available [here](https://p4.org/specs/)
 
 All excercises in this repository use the v1model architecture, the documentation for which is available at:
+
 1. The BMv2 Simple Switch target document accessible [here](https://github.com/p4lang/behavioral-model/blob/master/docs/simple_switch.md) talks mainly about the v1model architecture.
 2. The include file `v1model.p4` has extensive comments and can be accessed [here](https://github.com/p4lang/p4c/blob/master/p4include/v1model.p4).
