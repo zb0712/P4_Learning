@@ -102,6 +102,19 @@ control MyIngress(inout headers hdr,
         mark_to_drop(standard_metadata);
     }
     action set_ecmp_select(bit<16> ecmp_base, bit<32> ecmp_count) {
+        hash(
+            meta.ecmp_select,
+            HashAlgorithm.crc16,
+            ecmp_base,
+            {
+                hdr.ipv4.srcAddr,
+                hdr.ipv4.dstAddr,
+                hdr.ipv4.protocol,
+                hdr.tcp.srcPort,
+                hdr.tcp.dstPort
+            },
+            ecmp_count
+        );
         /* TODO: hash on 5-tuple and save the hash result in meta.ecmp_select
            so that the ecmp_nhop table can use it to make a forwarding decision accordingly */
     }
@@ -135,6 +148,10 @@ control MyIngress(inout headers hdr,
         /* TODO: apply ecmp_group table and ecmp_nhop table if IPv4 header is
          * valid and TTL hasn't reached zero
          */
+        if (hdr.ipv4.isValid() && hdr.ipv4.ttl != 0) {
+            ecmp_group.apply();
+            ecmp_nhop.apply();
+        }
     }
 }
 
