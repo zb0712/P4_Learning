@@ -1,0 +1,8 @@
+{
+  "target": "bmv2",
+  "p4info": "build/firewall.p4.p4info.txt",
+  "bmv2_json": "build/firewall.json",
+  "table_entries": [
+    
+  ]
+}
