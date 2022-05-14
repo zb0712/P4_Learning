@@ -235,14 +235,12 @@ control MyEgress(inout headers hdr,
             }
             // set switch ID field
             swid.apply();
-            // TODO: fill out the rest of the probe packet fields
-            // hdr.probe_data[0].port = ...
-            // hdr.probe_data[0].byte_cnt = ...
-            // TODO: read / update the last_time_reg
-            // last_time_reg.read(<val>, <index>);
-            // last_time_reg.write(<index>, <val>);
-            // hdr.probe_data[0].last_time = ...
-            // hdr.probe_data[0].cur_time = ...
+            hdr.probe_data[0].port = meta.egress_spec;
+            hdr.probe_data[0].byte_cnt = byte_cnt;
+            last_time_reg.read(last_time, (bit<32>)standard_metadata.egress_port);
+            hdr.probe_data[0].last_time = last_time;
+            last_time_reg.write((bit<32>)standard_metadata.egress_port, cur_time);
+            hdr.probe_data[0].cur_time = cur_time;
         }
     }
 }
